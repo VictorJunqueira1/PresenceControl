@@ -1,0 +1,18 @@
+[
+  {
+    "activityId": "teste-cabuloso",
+    "activityName": "TESTE CABULOSO",
+    "studentName": "Aaaa",
+    "ra": "Aaaaa",
+    "type": "Entry",
+    "registeredAt": "2026-09-28T10:59:53.4062618-03:00"
+  },
+  {
+    "activityId": "teste-cabuloso",
+    "activityName": "TESTE CABULOSO",
+    "studentName": "Aaaa",
+    "ra": "Aaaa",
+    "type": "Exit",
+    "registeredAt": "2026-09-28T11:01:32.0756048-03:00"
+  }
+]

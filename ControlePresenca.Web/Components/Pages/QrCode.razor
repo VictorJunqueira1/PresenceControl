@@ -1,0 +1,64 @@
+﻿@page "/qrcode/{ActivityId}"
+
+@using ControlePresenca.Application.Contracts
+@using ControlePresenca.Domain.Entities
+@using ControlePresenca.Web.Services
+
+@inject IActivityRepository ActivityRepository
+@inject IQrCodeService QrCodeService
+
+<PageTitle>QR Code</PageTitle>
+
+@if (_loading)
+{
+    <p>Carregando...</p>
+}
+else if (_activity is null)
+{
+    <p>Atividade não encontrada.</p>
+}
+else
+{
+    <div class="text-center">
+        <h1>@_activity.Name</h1>
+
+        <p>
+            @_activity.Date.ToString("dd/MM/yyyy")
+        </p>
+
+        <img src="@_qrCode"
+             alt="QR Code da atividade"
+             style="width: 400px; max-width: 100%;" />
+
+        <p>
+            Escaneie para registrar sua presença.
+        </p>
+
+        <small>@_attendanceUrl</small>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public string ActivityId { get; set; } = string.Empty;
+
+    private Activity? _activity;
+    private string _qrCode = string.Empty;
+    private string _attendanceUrl = string.Empty;
+    private bool _loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+
+        _activity = await ActivityRepository.GetByIdAsync(ActivityId);
+
+        if (_activity is not null)
+        {
+            _attendanceUrl = QrCodeService.BuildAttendanceUrl(_activity.Id);
+            _qrCode = QrCodeService.GenerateAttendanceQrCode(_activity.Id);
+        }
+
+        _loading = false;
+    }
+}

@@ -1,0 +1,243 @@
+﻿@page "/presenca/{activityId}"
+@rendermode InteractiveServer
+
+@using ControlePresenca.Application.Contracts
+@using ControlePresenca.Application.Enums
+@using ControlePresenca.Application.UseCases.Attendances.Register
+@using ControlePresenca.Domain.Entities
+@using ControlePresenca.Domain.Enums
+@using ControlePresenca.Web.Models
+
+@inject IActivityRepository ActivityRepository
+@inject RegisterAttendanceUseCase RegisterAttendanceUseCase
+@inject IJSRuntime JS
+
+<PageTitle>Registro de Presença</PageTitle>
+
+<div class="attendance-container">
+
+    @if (_loading)
+    {
+        <p>Carregando atividade...</p>
+    }
+    else if (!string.IsNullOrWhiteSpace(_loadError))
+    {
+        <div class="alert alert-danger">
+            @_loadError
+        </div>
+    }
+    else if (_activity is not null)
+    {
+        <div class="attendance-card">
+
+            <h1>@_activity.Name</h1>
+
+            <p>
+                @_activity.Date.ToString("dd/MM/yyyy")
+            </p>
+
+            @if (_registrationFinished)
+            {
+                <div class="alert alert-success">
+                    <h3>Presença registrada!</h3>
+                    <p>@_message</p>
+                </div>
+            }
+            else
+            {
+                <EditForm Model="_form" OnValidSubmit="RegisterAsync">
+                    <DataAnnotationsValidator />
+
+                    <div class="form-group">
+                        <label for="name">Nome</label>
+
+                        <InputText id="name"
+                                   class="form-control"
+                                   @bind-Value="_form.Name" />
+
+                        <ValidationMessage For="@(() => _form.Name)" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ra">RA</label>
+
+                        <InputText id="ra"
+                                   class="form-control"
+                                   @bind-Value="_form.RA" />
+
+                        <ValidationMessage For="@(() => _form.RA)" />
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(_message))
+                    {
+                        <div class="@_messageCssClass">
+                            @_message
+                        </div>
+                    }
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            disabled="@(_submitting || string.IsNullOrWhiteSpace(_deviceId))">
+
+                        @if (_submitting)
+                        {
+                            <span>Registrando...</span>
+                        }
+                        else if (_retryRequired)
+                        {
+                            <span>Tentar novamente</span>
+                        }
+                        else
+                        {
+                            <span>Registrar presença</span>
+                        }
+
+                    </button>
+                </EditForm>
+            }
+
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter] public string ActivityId { get; set; } = string.Empty;
+
+    private Activity? _activity;
+    private readonly AttendanceFormModel _form = new();
+
+    private bool _loading = true;
+    private bool _submitting;
+    private bool _retryRequired;
+    private bool _registrationFinished;
+
+    private string? _loadError;
+    private string? _message;
+    private string _messageCssClass = "alert alert-danger";
+
+    private string _deviceId = string.Empty;
+    private IJSObjectReference? _deviceModule;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _loadError = null;
+
+        try
+        {
+            _activity = await ActivityRepository.GetByIdAsync(ActivityId);
+
+            if (_activity is null)
+                _loadError = "Atividade não encontrada.";
+        }
+        catch
+        {
+            _loadError = "Não foi possível carregar a atividade. Tente novamente.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        _deviceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/device.js");
+
+        _deviceId = await _deviceModule.InvokeAsync<string>("getDeviceId");
+
+        StateHasChanged();
+    }
+
+    private async Task RegisterAsync()
+    {
+        if (_activity is null || _submitting)
+            return;
+
+        _submitting = true;
+        _message = null;
+
+        try
+        {
+            var request = new RegisterAttendanceRequest
+            {
+                ActivityId = _activity.Id,
+                StudentName = _form.Name,
+                RA = _form.RA,
+                DeviceId = _deviceId,
+                IsRetry = _retryRequired
+            };
+
+            var response = await RegisterAttendanceUseCase.ExecuteAsync(request);
+
+            HandleResponse(response);
+        }
+        catch
+        {
+            _message = "Ocorreu um erro inesperado. Tente novamente.";
+            _messageCssClass = "alert alert-danger";
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+
+    private void HandleResponse(RegisterAttendanceResponse response)
+    {
+        switch (response.Status)
+        {
+            case RegisterAttendanceStatus.Success:
+                _registrationFinished = true;
+                _message = "Seu registro foi realizado com sucesso.";
+                _messageCssClass = "alert alert-success";
+                break;
+
+            case RegisterAttendanceStatus.StoredForRetry:
+                _registrationFinished = true;
+                _message = "Seu registro foi recebido e será processado assim que a conexão for restabelecida.";
+                _messageCssClass = "alert alert-success";
+                break;
+
+            case RegisterAttendanceStatus.AlreadyRegistered:
+                _message = "Presença já registrada para esta atividade.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.AttendanceWindowClosed:
+                _message = "O período para registro desta presença está encerrado.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.ActivityNotFound:
+                _message = "Atividade não encontrada.";
+                _messageCssClass = "alert alert-danger";
+                break;
+
+            case RegisterAttendanceStatus.RetryRequired:
+                _retryRequired = true;
+                _message = "Não foi possível registrar sua presença. Clique em tentar novamente.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.InvalidRequest:
+                _message = "Verifique os dados informados.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.DeviceAlreadyUsed:
+                _message = "Este dispositivo já realizou um registro nesta atividade.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            default:
+                _message = "Não foi possível registrar sua presença.";
+                _messageCssClass = "alert alert-danger";
+                break;
+        }
+    }
+}

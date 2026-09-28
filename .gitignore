@@ -1,0 +1,28 @@
+# Visual Studio
+.vs/
+
+# Build
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider / JetBrains
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Environment / secrets
+.env
+.env.*
+appsettings.Development.json
+appsettings.*.json
+appsettings
