@@ -9,89 +9,101 @@
 @inject IQrCodeService QrCodeService
 @inject IJSRuntime JS
 
-<PageTitle>QR Code - Presença</PageTitle>
+@implements IAsyncDisposable
+
+<PageTitle>@(_activity?.Name ?? "QR Code") - Controle de Presença</PageTitle>
 
 <section class="qr-page">
-    <div class="qr-wrapper">
+    <div class="qr-container">
 
         @if (_loading)
         {
             <div class="qr-state">
                 <div class="loading-spinner"></div>
-                <p>Carregando QR Code...</p>
+
+                <h1>Preparando QR Code</h1>
+                <p>Aguarde enquanto carregamos a atividade.</p>
             </div>
         }
         else if (_activity is null)
         {
             <div class="qr-state">
+                <div class="state-icon">!</div>
+
                 <h1>Atividade não encontrada</h1>
                 <p>Não foi possível localizar a atividade informada.</p>
             </div>
         }
         else
         {
-            <div class="qr-actions">
-                <button type="button" class="print-button" @onclick="PrintAsync">
-                    Imprimir QR Code
-                </button>
+            <div class="qr-toolbar">
+                <div class="qr-brand">
+                    <span class="qr-brand__name">UNASP</span>
+                    <span class="qr-brand__description">Controle de Presença</span>
+                </div>
+
+                <div class="qr-toolbar__actions">
+                    <button type="button" class="qr-action qr-action--secondary" @onclick="ToggleFullscreenAsync">
+                        <span class="qr-action__icon">⛶</span>
+                        <span>Tela cheia</span>
+                    </button>
+
+                    <button type="button" class="qr-action qr-action--primary" @onclick="PrintAsync">
+                        <span>Imprimir</span>
+                    </button>
+                </div>
             </div>
 
-            <article class="qr-sheet">
+            <article class="qr-display" @ref="_qrDisplay">
 
-                <header class="qr-header">
-                    <span class="qr-brand">UNASP</span>
-
-                    <span class="qr-label">
-                        Controle de Presença
-                    </span>
-                </header>
-
-                <div class="qr-content">
-                    <span class="qr-eyebrow">Atividade</span>
+                <header class="qr-heading">
+                    <span class="qr-eyebrow">Registro de presença</span>
 
                     <h1>@_activity.Name</h1>
 
                     <p class="qr-date">
                         @_activity.Date.ToString("dd/MM/yyyy")
                     </p>
+                </header>
 
-                    <div class="qr-image-wrapper">
+                <div class="qr-main">
+                    <div class="qr-code-frame">
                         <img src="@_qrCode"
-                             class="qr-image"
+                             class="qr-code-image"
                              alt="QR Code para registro de presença" />
                     </div>
 
-                    <h2>Escaneie para registrar sua presença</h2>
-
-                    <p class="qr-description">
-                        Utilize a câmera do seu celular para acessar o formulário.
-                    </p>
-
-                    <div class="qr-schedules">
-                        <div>
-                            <span>Entrada</span>
-
-                            <strong>
-                                @_activity.EntryWindow.StartAt.ToString("HH:mm")
-                                às
-                                @_activity.EntryWindow.EndAt.ToString("HH:mm")
-                            </strong>
-                        </div>
-
-                        <div>
-                            <span>Saída</span>
-
-                            <strong>
-                                @_activity.ExitWindow.StartAt.ToString("HH:mm")
-                                às
-                                @_activity.ExitWindow.EndAt.ToString("HH:mm")
-                            </strong>
-                        </div>
+                    <div class="qr-instruction">
+                        <h2>Aponte a câmera do celular para o QR Code</h2>
+                        <p>Escaneie para acessar o formulário e registrar sua presença.</p>
                     </div>
                 </div>
 
-                <footer class="qr-footer">
-                    @_attendanceUrl
+                <div class="qr-schedules">
+                    <div class="qr-schedule">
+                        <span class="qr-schedule__label">Entrada</span>
+
+                        <strong>
+                            @_activity.EntryWindow.StartAt.ToString("HH:mm")
+                            <span>—</span>
+                            @_activity.EntryWindow.EndAt.ToString("HH:mm")
+                        </strong>
+                    </div>
+
+                    <div class="qr-schedule">
+                        <span class="qr-schedule__label">Saída</span>
+
+                        <strong>
+                            @_activity.ExitWindow.StartAt.ToString("HH:mm")
+                            <span>—</span>
+                            @_activity.ExitWindow.EndAt.ToString("HH:mm")
+                        </strong>
+                    </div>
+                </div>
+
+                <footer class="qr-display__footer">
+                    <span>Não consegue escanear?</span>
+                    <span class="qr-url">@_attendanceUrl</span>
                 </footer>
 
             </article>
@@ -107,6 +119,8 @@
     private string _qrCode = string.Empty;
     private string _attendanceUrl = string.Empty;
     private bool _loading = true;
+    private IJSObjectReference? _displayModule;
+    private ElementReference _qrDisplay;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -116,11 +130,11 @@
         {
             _activity = await ActivityRepository.GetByIdAsync(ActivityId);
 
-            if (_activity is not null)
-            {
-                _attendanceUrl = QrCodeService.BuildAttendanceUrl(_activity.Id);
-                _qrCode = QrCodeService.GenerateAttendanceQrCode(_activity.Id);
-            }
+            if (_activity is null)
+                return;
+
+            _attendanceUrl = QrCodeService.BuildAttendanceUrl(_activity.Id);
+            _qrCode = QrCodeService.GenerateAttendanceQrCode(_activity.Id);
         }
         finally
         {
@@ -129,4 +143,16 @@
     }
 
     private async Task PrintAsync() => await JS.InvokeVoidAsync("window.print");
+
+    private async Task ToggleFullscreenAsync()
+    {
+        _displayModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/display.js");
+        await _displayModule.InvokeVoidAsync("toggleFullscreen", _qrDisplay);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_displayModule is not null)
+            await _displayModule.DisposeAsync();
+    }
 }
