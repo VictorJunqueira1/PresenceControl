@@ -14,92 +14,139 @@
 
 <PageTitle>Registro de Presença</PageTitle>
 
-<div class="attendance-container">
+<section class="attendance-page">
+    <div class="attendance-wrapper">
 
-    @if (_loading)
-    {
-        <p>Carregando atividade...</p>
-    }
-    else if (!string.IsNullOrWhiteSpace(_loadError))
-    {
-        <div class="alert alert-danger">
-            @_loadError
-        </div>
-    }
-    else if (_activity is not null)
-    {
-        <div class="attendance-card">
+        @if (_loading)
+        {
+            <div class="state-card">
+                <div class="loading-spinner"></div>
 
-            <h1>@_activity.Name</h1>
+                <h1>Carregando atividade</h1>
+                <p>Aguarde enquanto buscamos as informações.</p>
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(_loadError))
+        {
+            <div class="state-card">
+                <div class="state-symbol state-symbol--error">!</div>
 
-            <p>
-                @_activity.Date.ToString("dd/MM/yyyy")
-            </p>
+                <h1>Não foi possível continuar</h1>
+                <p>@_loadError</p>
+            </div>
+        }
+        else if (_activity is not null)
+        {
+            <div class="attendance-card">
 
-            @if (_registrationFinished)
-            {
-                <div class="alert alert-success">
-                    <h3>Presença registrada!</h3>
-                    <p>@_message</p>
+                <div class="attendance-card__header">
+                    <span class="attendance-eyebrow">Registro de presença</span>
+
+                    <h1>@_activity.Name</h1>
+
+                    <p class="attendance-date">
+                        @_activity.Date.ToString("dd/MM/yyyy")
+                    </p>
                 </div>
-            }
-            else
-            {
-                <EditForm Model="_form" OnValidSubmit="RegisterAsync">
-                    <DataAnnotationsValidator />
 
-                    <div class="form-group">
-                        <label for="name">Nome</label>
+                <div class="attendance-windows">
+                    <div class="attendance-window">
+                        <span class="attendance-window__label">Entrada</span>
 
-                        <InputText id="name"
-                                   class="form-control"
-                                   @bind-Value="_form.Name" />
-
-                        <ValidationMessage For="@(() => _form.Name)" />
+                        <strong>
+                            @_activity.EntryWindow.StartAt.ToString("HH:mm")
+                            às
+                            @_activity.EntryWindow.EndAt.ToString("HH:mm")
+                        </strong>
                     </div>
 
-                    <div class="form-group">
-                        <label for="ra">RA</label>
+                    <div class="attendance-window">
+                        <span class="attendance-window__label">Saída</span>
 
-                        <InputText id="ra"
-                                   class="form-control"
-                                   @bind-Value="_form.RA" />
-
-                        <ValidationMessage For="@(() => _form.RA)" />
+                        <strong>
+                            @_activity.ExitWindow.StartAt.ToString("HH:mm")
+                            às
+                            @_activity.ExitWindow.EndAt.ToString("HH:mm")
+                        </strong>
                     </div>
+                </div>
 
-                    @if (!string.IsNullOrWhiteSpace(_message))
-                    {
-                        <div class="@_messageCssClass">
-                            @_message
+                @if (_registrationFinished)
+                {
+                    <div class="registration-result">
+                        <div class="state-symbol state-symbol--success">✓</div>
+
+                        <h2>Presença registrada</h2>
+
+                        <p>@_message</p>
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="_form" OnValidSubmit="RegisterAsync" class="attendance-form">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-field">
+                            <label for="name">Nome completo</label>
+
+                            <InputText id="name"
+                                       class="form-input"
+                                       autocomplete="name"
+                                       placeholder="Digite seu nome completo"
+                                       @bind-Value="_form.Name" />
+
+                            <ValidationMessage For="@(() => _form.Name)" />
                         </div>
-                    }
 
-                    <button type="submit"
-                            class="btn btn-primary"
-                            disabled="@(_submitting || string.IsNullOrWhiteSpace(_deviceId))">
+                        <div class="form-field">
+                            <label for="ra">RA</label>
 
-                        @if (_submitting)
+                            <InputText id="ra"
+                                       class="form-input"
+                                       inputmode="numeric"
+                                       autocomplete="off"
+                                       placeholder="Digite seu RA"
+                                       @bind-Value="_form.RA" />
+
+                            <ValidationMessage For="@(() => _form.RA)" />
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(_message))
                         {
-                            <span>Registrando...</span>
-                        }
-                        else if (_retryRequired)
-                        {
-                            <span>Tentar novamente</span>
-                        }
-                        else
-                        {
-                            <span>Registrar presença</span>
+                            <div class="@GetMessageCssClass()">
+                                @_message
+                            </div>
                         }
 
-                    </button>
-                </EditForm>
-            }
+                        <button type="submit"
+                                class="attendance-submit"
+                                disabled="@(_submitting || string.IsNullOrWhiteSpace(_deviceId))">
 
-        </div>
-    }
+                            @if (_submitting)
+                            {
+                                <span class="button-spinner"></span>
+                                <span>Registrando...</span>
+                            }
+                            else if (_retryRequired)
+                            {
+                                <span>Tentar novamente</span>
+                            }
+                            else
+                            {
+                                <span>Registrar presença</span>
+                            }
+                        </button>
 
-</div>
+                        <p class="attendance-help">
+                            O sistema identificará automaticamente se o registro corresponde à entrada ou à saída.
+                        </p>
+                    </EditForm>
+                }
+            </div>
+        }
+
+    </div>
+</section>
 
 @code {
     [Parameter] public string ActivityId { get; set; } = string.Empty;
@@ -147,7 +194,6 @@
             return;
 
         _deviceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/device.js");
-
         _deviceId = await _deviceModule.InvokeAsync<string>("getDeviceId");
 
         StateHasChanged();
@@ -239,5 +285,16 @@
                 _messageCssClass = "alert alert-danger";
                 break;
         }
+    }
+
+    private string GetMessageCssClass()
+    {
+        if (_messageCssClass.Contains("success"))
+            return "form-message form-message--success";
+
+        if (_messageCssClass.Contains("warning"))
+            return "form-message form-message--warning";
+
+        return "form-message form-message--error";
     }
 }

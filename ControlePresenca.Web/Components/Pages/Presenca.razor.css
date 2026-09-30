@@ -1,0 +1,282 @@
+.attendance-page {
+    display: flex;
+    width: 100%;
+    padding: 56px 24px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.attendance-wrapper {
+    width: 100%;
+    max-width: 520px;
+}
+
+.attendance-card,
+.state-card {
+    overflow: hidden;
+    border: 1px solid #e3e8ef;
+    border-radius: 20px;
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(16, 24, 40, .07);
+}
+
+.attendance-card__header {
+    padding: 32px 32px 24px;
+    text-align: center;
+}
+
+.attendance-eyebrow {
+    display: inline-block;
+    margin-bottom: 10px;
+    color: #0d3164;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.attendance-card__header h1 {
+    margin-bottom: 8px;
+    color: #101828;
+    font-size: 1.7rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.attendance-date {
+    margin: 0;
+    color: #667085;
+    font-size: .95rem;
+}
+
+.attendance-windows {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 0 32px 28px;
+}
+
+.attendance-window {
+    display: flex;
+    padding: 14px 16px;
+    flex-direction: column;
+    gap: 3px;
+    border: 1px solid #e4e7ec;
+    border-radius: 12px;
+    background: #f9fafb;
+}
+
+.attendance-window__label {
+    color: #667085;
+    font-size: .76rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.attendance-window strong {
+    color: #344054;
+    font-size: .92rem;
+}
+
+.attendance-form {
+    padding: 28px 32px 32px;
+    border-top: 1px solid #eaecf0;
+}
+
+.form-field {
+    margin-bottom: 20px;
+}
+
+    .form-field label {
+        display: block;
+        margin-bottom: 7px;
+        color: #344054;
+        font-size: .88rem;
+        font-weight: 600;
+    }
+
+.form-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 14px;
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+    outline: none;
+    background: #ffffff;
+    color: #101828;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+    .form-input::placeholder {
+        color: #98a2b3;
+    }
+
+    .form-input:focus {
+        border-color: #0d3164;
+        box-shadow: 0 0 0 3px rgba(13, 49, 100, .10);
+    }
+
+.attendance-submit {
+    display: flex;
+    width: 100%;
+    min-height: 50px;
+    margin-top: 24px;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 0;
+    border-radius: 10px;
+    background: #0d3164;
+    color: #ffffff;
+    font-weight: 700;
+    transition: background .15s ease, transform .15s ease;
+}
+
+    .attendance-submit:hover:not(:disabled) {
+        background: #09274f;
+    }
+
+    .attendance-submit:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    .attendance-submit:disabled {
+        cursor: not-allowed;
+        opacity: .6;
+    }
+
+.attendance-help {
+    margin: 14px 0 0;
+    color: #98a2b3;
+    font-size: .78rem;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.form-message {
+    margin-top: 4px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    font-size: .86rem;
+    line-height: 1.45;
+}
+
+.form-message--success {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+.form-message--warning {
+    background: #fffaeb;
+    color: #b54708;
+}
+
+.form-message--error {
+    background: #fef3f2;
+    color: #b42318;
+}
+
+.registration-result,
+.state-card {
+    padding: 44px 32px;
+    text-align: center;
+}
+
+.registration-result {
+    border-top: 1px solid #eaecf0;
+}
+
+    .registration-result h2,
+    .state-card h1 {
+        margin: 16px 0 8px;
+        color: #101828;
+        font-size: 1.35rem;
+    }
+
+    .registration-result p,
+    .state-card p {
+        margin: 0;
+        color: #667085;
+        line-height: 1.5;
+    }
+
+.state-symbol {
+    display: flex;
+    width: 52px;
+    height: 52px;
+    margin: 0 auto;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    font-weight: 800;
+}
+
+.state-symbol--success {
+    background: #ecfdf3;
+    color: #039855;
+}
+
+.state-symbol--error {
+    background: #fef3f2;
+    color: #d92d20;
+}
+
+.loading-spinner,
+.button-spinner {
+    border-radius: 50%;
+    animation: spin .8s linear infinite;
+}
+
+.loading-spinner {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto;
+    border: 3px solid #eaecf0;
+    border-top-color: #0d3164;
+}
+
+.button-spinner {
+    width: 17px;
+    height: 17px;
+    border: 2px solid rgba(255, 255, 255, .35);
+    border-top-color: #ffffff;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 576px) {
+    .attendance-page {
+        padding: 24px 16px;
+    }
+
+    .attendance-card,
+    .state-card {
+        border-radius: 16px;
+    }
+
+    .attendance-card__header {
+        padding: 26px 20px 22px;
+    }
+
+    .attendance-card__header h1 {
+        font-size: 1.45rem;
+    }
+
+    .attendance-windows {
+        gap: 8px;
+        padding: 0 20px 22px;
+    }
+
+    .attendance-window {
+        padding: 12px;
+    }
+
+    .attendance-form {
+        padding: 24px 20px;
+    }
+}
