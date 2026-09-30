@@ -26,3 +26,10 @@ obj/
 appsettings.Development.json
 appsettings.*.json
 appsettings
+
+# Runtime data
+**/App_Data/pending-attendances.json
+**/App_Data/pending-attendances.json.tmp
+
+# Tests
+TestResults/

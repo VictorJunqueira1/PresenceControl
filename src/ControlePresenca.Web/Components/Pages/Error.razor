@@ -1,0 +1,31 @@
+﻿@page "/error"
+
+<PageTitle>Erro inesperado</PageTitle>
+
+<main class="status-page">
+    <section class="status-card">
+        <span class="status-code">500</span>
+
+        <h1>Não foi possível concluir a operação</h1>
+
+        <p>
+            Ocorreu um erro inesperado durante o processamento.
+            Tente novamente em alguns instantes.
+        </p>
+
+        <div class="status-actions">
+            <a class="primary-button" href="/">Voltar ao início</a>
+
+            <button class="secondary-button" type="button" @onclick="Reload">
+                Tentar novamente
+            </button>
+        </div>
+    </section>
+</main>
+
+@code {
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private void Reload() => NavigationManager.Refresh(forceReload: true);
+}

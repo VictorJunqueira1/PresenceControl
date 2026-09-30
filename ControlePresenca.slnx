@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ControlePresenca.Application/ControlePresenca.Application.csproj" />
+    <Project Path="src/ControlePresenca.Domain/ControlePresenca.Domain.csproj" />
+    <Project Path="src/ControlePresenca.Infrastructure/ControlePresenca.Infrastructure.csproj" />
+    <Project Path="src/ControlePresenca.Web/ControlePresenca.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ControlePresenca.LoadTests/ControlePresenca.LoadTests.csproj" />
+    <Project Path="tests/ControlePresenca.Tests/ControlePresenca.Tests.csproj" />
+  </Folder>
+</Solution>

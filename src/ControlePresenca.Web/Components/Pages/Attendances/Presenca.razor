@@ -1,0 +1,300 @@
+@page "/presenca/{activityId}"
+@rendermode InteractiveServer
+
+@using ControlePresenca.Application.Activities.Models
+@using ControlePresenca.Application.Activities.Queries.GetActivityById
+@using ControlePresenca.Application.Attendances.Commands.RegisterAttendance
+@using ControlePresenca.Application.Core.Mediator
+@using ControlePresenca.Web.Components.Pages.Attendances
+@inject IMediator Mediator
+@inject IJSRuntime JS
+
+<PageTitle>Registro de Presença</PageTitle>
+
+<section class="attendance-page">
+    <div class="attendance-wrapper">
+
+        @if (_loading)
+        {
+            <div class="state-card">
+                <div class="loading-spinner"></div>
+
+                <h1>Carregando atividade</h1>
+                <p>Aguarde enquanto buscamos as informações.</p>
+            </div>
+        }
+        else if (!string.IsNullOrWhiteSpace(_loadError))
+        {
+            <div class="state-card">
+                <div class="state-symbol state-symbol--error">!</div>
+
+                <h1>Não foi possível continuar</h1>
+                <p>@_loadError</p>
+            </div>
+        }
+        else if (_activity is not null)
+        {
+            <div class="attendance-brand">UNASP</div>
+            <div class="attendance-card">
+
+                <div class="attendance-card__header">
+
+                    <span class="attendance-eyebrow">Registro de presença</span>
+
+                    <h1>@_activity.Name</h1>
+
+                    <p class="attendance-date">
+                        @_activity.Date.ToString("dd/MM/yyyy")
+                    </p>
+                </div>
+
+                <div class="attendance-windows">
+                    <div class="attendance-window">
+                        <span class="attendance-window__label">Entrada</span>
+
+                        <strong>
+                            @_activity.EntryStartAt.ToString("HH:mm")
+                            às
+                            @_activity.EntryEndAt.ToString("HH:mm")
+                        </strong>
+                    </div>
+
+                    <div class="attendance-window">
+                        <span class="attendance-window__label">Saída</span>
+
+                        <strong>
+                            @_activity.ExitStartAt.ToString("HH:mm")
+                            às
+                            @_activity.ExitEndAt.ToString("HH:mm")
+                        </strong>
+                    </div>
+                </div>
+
+                @if (_registrationFinished)
+                {
+                    <div class="registration-result">
+                        <div class="state-symbol state-symbol--success">✓</div>
+
+                        <h2>Presença registrada</h2>
+
+                        <p>@_message</p>
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="_form" OnValidSubmit="RegisterAsync" class="attendance-form">
+                        <DataAnnotationsValidator />
+
+                        <div class="form-field">
+                            <label for="name">Nome completo</label>
+
+                            <div class="form-input-wrapper">
+                                <InputText id="name"
+                                           class="form-input"
+                                           autocomplete="name"
+                                           placeholder="Digite seu nome completo"
+                                           @bind-Value="_form.Name" />
+                            </div>
+
+                            <ValidationMessage For="@(() => _form.Name)" />
+                        </div>
+
+                        <div class="form-field">
+                            <label for="ra">RA</label>
+
+                            <div class="form-input-wrapper">
+                                <InputText id="ra"
+                                           class="form-input"
+                                           inputmode="numeric"
+                                           autocomplete="off"
+                                           placeholder="Digite seu RA"
+                                           @bind-Value="_form.RA" />
+                            </div>
+
+                            <ValidationMessage For="@(() => _form.RA)" />
+                        </div>
+
+                        @if (!string.IsNullOrWhiteSpace(_message))
+                        {
+                            <div class="@GetMessageCssClass()">
+                                @_message
+                            </div>
+                        }
+
+                        <button type="submit"
+                                class="attendance-submit"
+                                disabled="@(_submitting || string.IsNullOrWhiteSpace(_deviceId))">
+
+                            @if (_submitting)
+                            {
+                                <span class="button-spinner"></span>
+                                <span>Registrando...</span>
+                            }
+                            else if (_retryRequired)
+                            {
+                                <span>Tentar novamente</span>
+                            }
+                            else
+                            {
+                                <span>Registrar presença</span>
+                            }
+                        </button>
+
+                        <p class="attendance-help">
+                            O sistema identificará automaticamente se o registro corresponde à entrada ou à saída.
+                        </p>
+                    </EditForm>
+                }
+            </div>
+        }
+
+    </div>
+</section>
+
+@code {
+    [Parameter] public string ActivityId { get; set; } = string.Empty;
+
+    private ActivityModel? _activity;
+    private readonly AttendanceFormModel _form = new();
+
+    private bool _loading = true;
+    private bool _submitting;
+    private bool _retryRequired;
+    private bool _registrationFinished;
+
+    private string? _loadError;
+    private string? _message;
+    private string _messageCssClass = "alert alert-danger";
+
+    private string _deviceId = string.Empty;
+    private IJSObjectReference? _deviceModule;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        _loadError = null;
+
+        try
+        {
+            _activity = await Mediator.Send(new GetActivityByIdQuery(ActivityId));
+
+            if (_activity is null)
+                _loadError = "Atividade não encontrada.";
+        }
+        catch
+        {
+            _loadError = "Não foi possível carregar a atividade. Tente novamente.";
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        _deviceModule = await JS.InvokeAsync<IJSObjectReference>("import", "./js/device.js");
+        _deviceId = await _deviceModule.InvokeAsync<string>("getDeviceId");
+
+        StateHasChanged();
+    }
+
+    private async Task RegisterAsync()
+    {
+        if (_activity is null || _submitting)
+            return;
+
+        _submitting = true;
+        _message = null;
+
+        try
+        {
+            var command = new RegisterAttendanceCommand(
+                _activity.Id,
+                _form.Name,
+                _form.RA,
+                _deviceId);
+
+            var response = await Mediator.Send(command);
+
+            HandleResponse(response);
+        }
+        catch
+        {
+            _message = "Ocorreu um erro inesperado. Tente novamente.";
+            _messageCssClass = "alert alert-danger";
+        }
+        finally
+        {
+            _submitting = false;
+        }
+    }
+
+    private void HandleResponse(RegisterAttendanceResponse response)
+    {
+        switch (response.Status)
+        {
+            case RegisterAttendanceStatus.Success:
+                _registrationFinished = true;
+                _message = "Seu registro foi realizado com sucesso.";
+                _messageCssClass = "alert alert-success";
+                break;
+
+            case RegisterAttendanceStatus.StoredForRetry:
+                _registrationFinished = true;
+                _message = "Seu registro foi recebido e será processado assim que a conexão for restabelecida.";
+                _messageCssClass = "alert alert-success";
+                break;
+
+            case RegisterAttendanceStatus.AlreadyRegistered:
+                _message = "Presença já registrada para esta atividade.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.AttendanceWindowClosed:
+                _message = "O período para registro desta presença está encerrado.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.ActivityNotFound:
+                _message = "Atividade não encontrada.";
+                _messageCssClass = "alert alert-danger";
+                break;
+
+            case RegisterAttendanceStatus.RetryRequired:
+                _retryRequired = true;
+                _message = "Não foi possível registrar sua presença. Clique em tentar novamente.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.InvalidRequest:
+                _message = "Verifique os dados informados.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            case RegisterAttendanceStatus.DeviceAlreadyUsed:
+                _message = "Este dispositivo já realizou um registro nesta atividade.";
+                _messageCssClass = "alert alert-warning";
+                break;
+
+            default:
+                _message = "Não foi possível registrar sua presença.";
+                _messageCssClass = "alert alert-danger";
+                break;
+        }
+    }
+
+    private string GetMessageCssClass()
+    {
+        if (_messageCssClass.Contains("success"))
+            return "form-message form-message--success";
+
+        if (_messageCssClass.Contains("warning"))
+            return "form-message form-message--warning";
+
+        return "form-message form-message--error";
+    }
+}
