@@ -32,9 +32,7 @@ public sealed class GoogleSheetsClient : IGoogleSheetsClient
         });
     }
 
-    public async Task<IList<IList<object>>> ReadAsync(
-        string range,
-        CancellationToken cancellationToken = default)
+    public async Task<IList<IList<object>>> ReadAsync(string range, CancellationToken cancellationToken = default)
     {
         var request = _service.Spreadsheets.Values.Get(_options.SpreadsheetId, range);
         var response = await request.ExecuteAsync(cancellationToken);
@@ -56,9 +54,7 @@ public sealed class GoogleSheetsClient : IGoogleSheetsClient
         await request.ExecuteAsync(cancellationToken);
     }
 
-    public async Task<bool> SheetExistsAsync(
-        string sheetName,
-        CancellationToken cancellationToken = default)
+    public async Task<bool> SheetExistsAsync(string sheetName, CancellationToken cancellationToken = default)
     {
         var request = _service.Spreadsheets.Get(_options.SpreadsheetId);
         request.Fields = "sheets.properties.title";
@@ -71,9 +67,7 @@ public sealed class GoogleSheetsClient : IGoogleSheetsClient
             StringComparison.OrdinalIgnoreCase)) == true;
     }
 
-    public async Task CreateSheetAsync(
-        string sheetName,
-        CancellationToken cancellationToken = default)
+    public async Task CreateSheetAsync(string sheetName, CancellationToken cancellationToken = default)
     {
         var requestBody = new BatchUpdateSpreadsheetRequest
         {

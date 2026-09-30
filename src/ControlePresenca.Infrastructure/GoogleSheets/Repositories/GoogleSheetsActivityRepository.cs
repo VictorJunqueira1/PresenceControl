@@ -23,9 +23,7 @@ public sealed class GoogleSheetsActivityRepository(
     private readonly Dictionary<string, Activity> _cache = new(StringComparer.OrdinalIgnoreCase);
     private DateTimeOffset _lastRefresh = DateTimeOffset.MinValue;
 
-    public async Task<Activity?> GetByIdAsync(
-        string activityId,
-        CancellationToken cancellationToken = default)
+    public async Task<Activity?> GetByIdAsync(string activityId, CancellationToken cancellationToken = default)
     {
         await _cacheLock.WaitAsync(cancellationToken);
 
@@ -61,9 +59,7 @@ public sealed class GoogleSheetsActivityRepository(
         }
     }
 
-    async Task<ActivityModel?> IActivityQueryRepository.GetByIdAsync(
-        string activityId,
-        CancellationToken cancellationToken)
+    async Task<ActivityModel?> IActivityQueryRepository.GetByIdAsync(string activityId, CancellationToken cancellationToken)
     {
         var activity = await GetByIdAsync(activityId, cancellationToken);
 

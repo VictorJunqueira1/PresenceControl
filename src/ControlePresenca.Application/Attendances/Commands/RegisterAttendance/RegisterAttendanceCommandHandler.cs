@@ -11,9 +11,7 @@ public sealed class RegisterAttendanceCommandHandler(
     IDateTimeProvider dateTimeProvider)
     : ICommandHandler<RegisterAttendanceCommand, RegisterAttendanceResponse>
 {
-    public async Task<RegisterAttendanceResponse> Handle(
-        RegisterAttendanceCommand command,
-        CancellationToken cancellationToken = default)
+    public async Task<RegisterAttendanceResponse> Handle(RegisterAttendanceCommand command, CancellationToken cancellationToken = default)
     {
         if (IsInvalid(command))
             return CreateResponse(RegisterAttendanceStatus.InvalidRequest);

@@ -9,9 +9,7 @@ public sealed class ReprocessPendingAttendancesCommandHandler(
     IPendingAttendanceStore pendingAttendanceStore)
     : ICommandHandler<ReprocessPendingAttendancesCommand, ReprocessPendingAttendancesResult>
 {
-    public async Task<ReprocessPendingAttendancesResult> Handle(
-        ReprocessPendingAttendancesCommand command,
-        CancellationToken cancellationToken = default)
+    public async Task<ReprocessPendingAttendancesResult> Handle(ReprocessPendingAttendancesCommand command, CancellationToken cancellationToken = default)
     {
         var pendingAttendances = await pendingAttendanceStore.GetAllAsync(cancellationToken);
         var registered = 0;

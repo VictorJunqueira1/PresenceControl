@@ -18,9 +18,7 @@ public sealed class GoogleSheetsAttendanceRepository(
     private readonly ConcurrentDictionary<string, HashSet<string>> _registeredKeys = new();
     private readonly ConcurrentDictionary<string, HashSet<string>> _registeredDeviceKeys = new();
 
-    public async Task<AttendancePersistenceStatus> TryRegisterAsync(
-        Attendance attendance,
-        CancellationToken cancellationToken = default)
+    public async Task<AttendancePersistenceStatus> TryRegisterAsync(Attendance attendance, CancellationToken cancellationToken = default)
     {
         var sheetName = AttendanceSheetNameBuilder.Build(attendance);
         var sheetLock = _sheetLocks.GetOrAdd(sheetName, _ => new SemaphoreSlim(1, 1));
@@ -77,12 +75,9 @@ public sealed class GoogleSheetsAttendanceRepository(
         }
     }
 
-    private async Task EnsureSheetInitializedAsync(
-        string sheetName,
-        CancellationToken cancellationToken)
+    private async Task EnsureSheetInitializedAsync(string sheetName, CancellationToken cancellationToken)
     {
-        if (_registeredKeys.ContainsKey(sheetName)
-            && _registeredDeviceKeys.ContainsKey(sheetName))
+        if (_registeredKeys.ContainsKey(sheetName) && _registeredDeviceKeys.ContainsKey(sheetName))
             return;
 
         var exists = await client.SheetExistsAsync(sheetName, cancellationToken);

@@ -17,6 +17,7 @@ public static class DependencyInjectionExtension
         services.AddScoped<IQueryHandler<GetActivityByIdQuery, ActivityModel?>, GetActivityByIdQueryHandler>();
         services.AddScoped<ICommandHandler<RegisterAttendanceCommand, RegisterAttendanceResponse>, RegisterAttendanceCommandHandler>();
         services.AddScoped<ICommandHandler<ReprocessPendingAttendancesCommand, ReprocessPendingAttendancesResult>, ReprocessPendingAttendancesCommandHandler>();
+
         return services;
     }
 }

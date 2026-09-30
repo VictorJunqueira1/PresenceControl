@@ -4,10 +4,9 @@
 @using ControlePresenca.Application.Activities.Models
 @using ControlePresenca.Application.Activities.Queries.GetActivityById
 @using ControlePresenca.Application.Core.Mediator
-@using ControlePresenca.Web.Services
 
 @inject IMediator Mediator
-@inject IQrCodeService QrCodeService
+@inject IQrCodeGenerator QrCodeGenerator
 @inject IJSRuntime JS
 
 @implements IAsyncDisposable
@@ -134,8 +133,8 @@
             if (_activity is null)
                 return;
 
-            _attendanceUrl = QrCodeService.BuildAttendanceUrl(_activity.Id);
-            _qrCode = QrCodeService.GenerateAttendanceQrCode(_activity.Id);
+            _attendanceUrl = QrCodeGenerator.BuildAttendanceUrl(_activity.Id);
+            _qrCode = QrCodeGenerator.GenerateAttendanceQrCode(_activity.Id);
         }
         finally
         {

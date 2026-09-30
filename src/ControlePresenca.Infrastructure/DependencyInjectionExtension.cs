@@ -13,9 +13,7 @@ namespace ControlePresenca.Infrastructure;
 
 public static class DependencyInjectionExtension
 {
-    public static IServiceCollection AddInfrastructure(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<GoogleSheetsOptions>(configuration.GetSection(GoogleSheetsOptions.SectionName));
         services.Configure<PendingAttendanceOptions>(configuration.GetSection(PendingAttendanceOptions.SectionName));

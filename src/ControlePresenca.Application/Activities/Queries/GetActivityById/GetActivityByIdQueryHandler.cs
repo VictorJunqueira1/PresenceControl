@@ -5,9 +5,7 @@ namespace ControlePresenca.Application.Activities.Queries.GetActivityById;
 
 public sealed class GetActivityByIdQueryHandler(IActivityQueryRepository repository) : IQueryHandler<GetActivityByIdQuery, ActivityModel?>
 {
-    public Task<ActivityModel?> Handle(
-        GetActivityByIdQuery query,
-        CancellationToken cancellationToken = default)
+    public Task<ActivityModel?> Handle(GetActivityByIdQuery query, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(query.ActivityId))
             return Task.FromResult<ActivityModel?>(null);

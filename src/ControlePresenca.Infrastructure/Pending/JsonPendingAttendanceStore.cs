@@ -19,9 +19,7 @@ public sealed class JsonPendingAttendanceStore : IPendingAttendanceStore
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public JsonPendingAttendanceStore(
-        IOptions<PendingAttendanceOptions> options,
-        IHostEnvironment hostEnvironment)
+    public JsonPendingAttendanceStore(IOptions<PendingAttendanceOptions> options, IHostEnvironment hostEnvironment)
     {
         _filePath = ResolvePath(options.Value.FilePath, hostEnvironment.ContentRootPath);
     }
@@ -31,9 +29,7 @@ public sealed class JsonPendingAttendanceStore : IPendingAttendanceStore
         _filePath = ResolvePath(filePath, Directory.GetCurrentDirectory());
     }
 
-    public async Task SaveAsync(
-        Attendance attendance,
-        CancellationToken cancellationToken = default)
+    public async Task SaveAsync(Attendance attendance, CancellationToken cancellationToken = default)
     {
         await _lock.WaitAsync(cancellationToken);
 
@@ -53,8 +49,7 @@ public sealed class JsonPendingAttendanceStore : IPendingAttendanceStore
         }
     }
 
-    public async Task<IReadOnlyCollection<Attendance>> GetAllAsync(
-        CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<Attendance>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         await _lock.WaitAsync(cancellationToken);
 
@@ -68,9 +63,7 @@ public sealed class JsonPendingAttendanceStore : IPendingAttendanceStore
         }
     }
 
-    public async Task RemoveAsync(
-        Attendance attendance,
-        CancellationToken cancellationToken = default)
+    public async Task RemoveAsync(Attendance attendance, CancellationToken cancellationToken = default)
     {
         await _lock.WaitAsync(cancellationToken);
 
@@ -93,16 +86,10 @@ public sealed class JsonPendingAttendanceStore : IPendingAttendanceStore
 
         await using var stream = File.OpenRead(_filePath);
 
-        return await JsonSerializer.DeserializeAsync<List<Attendance>>(
-                   stream,
-                   _jsonOptions,
-                   cancellationToken)
-               ?? new List<Attendance>();
+        return await JsonSerializer.DeserializeAsync<List<Attendance>>(stream, _jsonOptions, cancellationToken) ?? new List<Attendance>();
     }
 
-    private async Task WriteInternalAsync(
-        List<Attendance> attendances,
-        CancellationToken cancellationToken)
+    private async Task WriteInternalAsync(List<Attendance> attendances, CancellationToken cancellationToken)
     {
         var directory = Path.GetDirectoryName(_filePath);
 
