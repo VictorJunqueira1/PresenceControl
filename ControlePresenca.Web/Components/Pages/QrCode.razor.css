@@ -60,13 +60,13 @@
     transition: background-color .15s ease, border-color .15s ease, transform .15s ease, box-shadow .15s ease;
 }
 
-    .qr-action:hover {
-        transform: translateY(-1px);
-    }
+.qr-action:hover {
+    transform: translateY(-1px);
+}
 
-    .qr-action:active {
-        transform: translateY(0);
-    }
+.qr-action:active {
+    transform: translateY(0);
+}
 
 .qr-action--primary {
     border: 1px solid #103a78;
@@ -75,9 +75,9 @@
     box-shadow: 0 5px 12px rgba(16, 58, 120, .15);
 }
 
-    .qr-action--primary:hover {
-        background: #0c3067;
-    }
+.qr-action--primary:hover {
+    background: #0c3067;
+}
 
 .qr-action--secondary {
     border: 1px solid #d5ddea;
@@ -85,10 +85,10 @@
     color: #344054;
 }
 
-    .qr-action--secondary:hover {
-        border-color: #b8c3d2;
-        background: #f8fafc;
-    }
+.qr-action--secondary:hover {
+    border-color: #b8c3d2;
+    background: #f8fafc;
+}
 
 .qr-action__icon {
     font-size: 1.05rem;
@@ -167,19 +167,19 @@
     text-align: center;
 }
 
-    .qr-instruction h2 {
-        margin: 0 0 7px;
-        color: #172033;
-        font-size: clamp(1.15rem, 2vw, 1.45rem);
-        font-weight: 750;
-    }
+.qr-instruction h2 {
+    margin: 0 0 7px;
+    color: #172033;
+    font-size: clamp(1.15rem, 2vw, 1.45rem);
+    font-weight: 750;
+}
 
-    .qr-instruction p {
-        margin: 0;
-        color: #64748b;
-        font-size: .98rem;
-        line-height: 1.5;
-    }
+.qr-instruction p {
+    margin: 0;
+    color: #64748b;
+    font-size: .98rem;
+    line-height: 1.5;
+}
 
 .qr-schedules {
     display: grid;
@@ -219,10 +219,10 @@
     font-weight: 750;
 }
 
-    .qr-schedule strong span {
-        margin: 0 3px;
-        color: #94a3b8;
-    }
+.qr-schedule strong span {
+    margin: 0 3px;
+    color: #94a3b8;
+}
 
 .qr-display__footer {
     display: flex;
@@ -251,16 +251,16 @@
     box-shadow: 0 20px 50px rgba(15, 23, 42, .07);
 }
 
-    .qr-state h1 {
-        margin: 18px 0 8px;
-        color: #101828;
-        font-size: 1.45rem;
-    }
+.qr-state h1 {
+    margin: 18px 0 8px;
+    color: #101828;
+    font-size: 1.45rem;
+}
 
-    .qr-state p {
-        margin: 0;
-        color: #667085;
-    }
+.qr-state p {
+    margin: 0;
+    color: #667085;
+}
 
 .state-icon {
     display: flex;
@@ -362,9 +362,9 @@
         padding: 28px 18px 18px;
     }
 
-        .qr-heading h1 {
-            font-size: 1.75rem;
-        }
+    .qr-heading h1 {
+        font-size: 1.75rem;
+    }
 
     .qr-date {
         font-size: .95rem;
@@ -388,13 +388,13 @@
         margin-top: 22px;
     }
 
-        .qr-instruction h2 {
-            font-size: 1.08rem;
-        }
+    .qr-instruction h2 {
+        font-size: 1.08rem;
+    }
 
-        .qr-instruction p {
-            font-size: .88rem;
-        }
+    .qr-instruction p {
+        font-size: .88rem;
+    }
 
     .qr-schedules {
         padding: 0 18px;
@@ -439,9 +439,9 @@
         min-height: 92px;
     }
 
-        .qr-schedule strong {
-            font-size: 1.12rem;
-        }
+    .qr-schedule strong {
+        font-size: 1.12rem;
+    }
 }
 
 .qr-display:fullscreen {
@@ -459,47 +459,47 @@
     box-shadow: none;
 }
 
-    .qr-display:fullscreen .qr-heading {
-        padding: 0 32px 20px;
-    }
+.qr-display:fullscreen .qr-heading {
+    padding: 0 32px 20px;
+}
 
-        .qr-display:fullscreen .qr-heading h1 {
-            font-size: clamp(2.8rem, 5vw, 4.5rem);
-        }
+.qr-display:fullscreen .qr-heading h1 {
+    font-size: clamp(2.8rem, 5vw, 4.5rem);
+}
 
-    .qr-display:fullscreen .qr-date {
-        font-size: 1.2rem;
-    }
+.qr-display:fullscreen .qr-date {
+    font-size: 1.2rem;
+}
 
-    .qr-display:fullscreen .qr-main {
-        padding: 10px 32px 24px;
-    }
+.qr-display:fullscreen .qr-main {
+    padding: 10px 32px 24px;
+}
 
-    .qr-display:fullscreen .qr-code-frame {
-        padding: 20px;
-    }
+.qr-display:fullscreen .qr-code-frame {
+    padding: 20px;
+}
 
-    .qr-display:fullscreen .qr-code-image {
-        width: min(46vh, 520px);
-    }
+.qr-display:fullscreen .qr-code-image {
+    width: min(46vh, 520px);
+}
 
-    .qr-display:fullscreen .qr-instruction {
-        margin-top: 20px;
-    }
+.qr-display:fullscreen .qr-instruction {
+    margin-top: 20px;
+}
 
-        .qr-display:fullscreen .qr-instruction h2 {
-            font-size: 1.5rem;
-        }
+.qr-display:fullscreen .qr-instruction h2 {
+    font-size: 1.5rem;
+}
 
-    .qr-display:fullscreen .qr-schedules {
-        width: 100%;
-        max-width: 620px;
-        margin-bottom: 0;
-    }
+.qr-display:fullscreen .qr-schedules {
+    width: 100%;
+    max-width: 620px;
+    margin-bottom: 0;
+}
 
-    .qr-display:fullscreen .qr-schedule {
-        min-height: 78px;
-    }
+.qr-display:fullscreen .qr-schedule {
+    min-height: 78px;
+}
 
 /* Impressão */
 @media print {
@@ -528,9 +528,9 @@
         padding: 0 0 20px;
     }
 
-        .qr-heading h1 {
-            font-size: 28pt;
-        }
+    .qr-heading h1 {
+        font-size: 28pt;
+    }
 
     .qr-date {
         font-size: 14pt;

@@ -31,15 +31,15 @@
     box-shadow: 0 -1px 4px rgba(0, 0, 0, .12);
 }
 
-    #blazor-error-ui .reload {
-        margin-left: .5rem;
-    }
+#blazor-error-ui .reload {
+    margin-left: .5rem;
+}
 
-    #blazor-error-ui .dismiss {
-        position: absolute;
-        right: 1rem;
-        cursor: pointer;
-    }
+#blazor-error-ui .dismiss {
+    position: absolute;
+    right: 1rem;
+    cursor: pointer;
+}
 
 @media (max-width: 576px) {
     .app-footer {
