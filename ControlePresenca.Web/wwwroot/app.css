@@ -29,10 +29,6 @@ h1, h2, h3, p {
     font-size: .82rem;
 }
 
-.invalid {
-    border-color: #d92d20 !important;
-}
-
 .valid.modified:not([type="checkbox"]) {
     border-color: #12b76a;
 }

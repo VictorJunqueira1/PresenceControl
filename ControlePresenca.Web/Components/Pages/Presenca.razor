@@ -37,9 +37,11 @@
         }
         else if (_activity is not null)
         {
+            <div class="attendance-brand">UNASP</div>
             <div class="attendance-card">
 
                 <div class="attendance-card__header">
+
                     <span class="attendance-eyebrow">Registro de presença</span>
 
                     <h1>@_activity.Name</h1>
@@ -89,11 +91,13 @@
                         <div class="form-field">
                             <label for="name">Nome completo</label>
 
-                            <InputText id="name"
-                                       class="form-input"
-                                       autocomplete="name"
-                                       placeholder="Digite seu nome completo"
-                                       @bind-Value="_form.Name" />
+                            <div class="form-input-wrapper">
+                                <InputText id="name"
+                                           class="form-input"
+                                           autocomplete="name"
+                                           placeholder="Digite seu nome completo"
+                                           @bind-Value="_form.Name" />
+                            </div>
 
                             <ValidationMessage For="@(() => _form.Name)" />
                         </div>
@@ -101,12 +105,14 @@
                         <div class="form-field">
                             <label for="ra">RA</label>
 
-                            <InputText id="ra"
-                                       class="form-input"
-                                       inputmode="numeric"
-                                       autocomplete="off"
-                                       placeholder="Digite seu RA"
-                                       @bind-Value="_form.RA" />
+                            <div class="form-input-wrapper">
+                                <InputText id="ra"
+                                           class="form-input"
+                                           inputmode="numeric"
+                                           autocomplete="off"
+                                           placeholder="Digite seu RA"
+                                           @bind-Value="_form.RA" />
+                            </div>
 
                             <ValidationMessage For="@(() => _form.RA)" />
                         </div>
