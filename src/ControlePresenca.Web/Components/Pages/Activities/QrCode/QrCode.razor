@@ -1,16 +1,6 @@
 @page "/qrcode/{ActivityId}"
 @rendermode InteractiveServer
 
-@using ControlePresenca.Application.Activities.Models
-@using ControlePresenca.Application.Activities.Queries.GetActivityById
-@using ControlePresenca.Application.Core.Mediator
-
-@inject IMediator Mediator
-@inject IQrCodeGenerator QrCodeGenerator
-@inject IJSRuntime JS
-
-@implements IAsyncDisposable
-
 <PageTitle>@(_activity?.Name ?? "QR Code") - Controle de Presença</PageTitle>
 
 <section class="qr-page">
@@ -101,58 +91,13 @@
                     </div>
                 </div>
 
-                <footer class="qr-display__footer">
+                @* <footer class="qr-display__footer">
                     <span>Não consegue escanear?</span>
                     <span class="qr-url">@_attendanceUrl</span>
-                </footer>
+                </footer> *@
 
             </article>
         }
 
     </div>
 </section>
-
-@code {
-    [Parameter] public string ActivityId { get; set; } = string.Empty;
-
-    private ActivityModel? _activity;
-    private string _qrCode = string.Empty;
-    private string _attendanceUrl = string.Empty;
-    private bool _loading = true;
-    private IJSObjectReference? _displayModule;
-    private ElementReference _qrDisplay;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        _loading = true;
-
-        try
-        {
-            _activity = await Mediator.Send(new GetActivityByIdQuery(ActivityId));
-
-            if (_activity is null)
-                return;
-
-            _attendanceUrl = QrCodeGenerator.BuildAttendanceUrl(_activity.Id);
-            _qrCode = QrCodeGenerator.GenerateAttendanceQrCode(_activity.Id);
-        }
-        finally
-        {
-            _loading = false;
-        }
-    }
-
-    private async Task PrintAsync() => await JS.InvokeVoidAsync("window.print");
-
-    private async Task ToggleFullscreenAsync()
-    {
-        _displayModule ??= await JS.InvokeAsync<IJSObjectReference>("import", "./js/display.js");
-        await _displayModule.InvokeVoidAsync("toggleFullscreen", _qrDisplay);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_displayModule is not null)
-            await _displayModule.DisposeAsync();
-    }
-}

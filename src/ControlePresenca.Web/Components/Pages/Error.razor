@@ -22,10 +22,3 @@
         </div>
     </section>
 </main>
-
-@code {
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    private void Reload() => NavigationManager.Refresh(forceReload: true);
-}
