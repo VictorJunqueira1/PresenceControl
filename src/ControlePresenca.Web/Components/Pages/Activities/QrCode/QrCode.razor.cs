@@ -15,7 +15,7 @@ public partial class QrCode : IAsyncDisposable
     private IMediator Mediator { get; set; } = default!;
 
     [Inject]
-    private QrCodeGenerator QrCodeGenerator { get; set; } = default!;
+    private IQrCodeGenerator QrCodeGenerator { get; set; } = default!;
 
     [Inject]
     private IJSRuntime JS { get; set; } = default!;

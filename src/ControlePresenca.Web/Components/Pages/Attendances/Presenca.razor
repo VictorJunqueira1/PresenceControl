@@ -1,8 +1,6 @@
 @page "/presenca/{activityId}"
 @rendermode InteractiveServer
 
-@inject IJSRuntime JS
-
 <PageTitle>Registro de Presença</PageTitle>
 
 <section class="attendance-page">
@@ -110,7 +108,7 @@
 
                         @if (!string.IsNullOrWhiteSpace(_message))
                         {
-                            <div class="@GetMessageCssClass()">
+                            <div class="@_messageCssClass">
                                 @_message
                             </div>
                         }
